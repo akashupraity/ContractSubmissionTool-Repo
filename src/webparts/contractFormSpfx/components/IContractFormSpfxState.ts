@@ -1,0 +1,127 @@
+import { IChildsItems } from "./models/IChildsItems";
+import { IListItem} from "./models/IListItem";
+import { IParentsItems} from "./models/IParentsItems";
+export interface IContractFormSpfxState {
+    ContractingParty:any;
+    BesaEntity:any;
+    CompanyProject:any;
+    ContractType:any;
+    PaymentType:any;
+    AddMore:boolean;
+    CurrentDate:Date;
+    SelectBeckDateerrMsg:string
+    VarFixedValue?: boolean;
+    VarAutoRnewal?:boolean,
+    VarRenewalNotice?:boolean,
+    VarPerpetual?:boolean
+    VarDiscretionary?:boolean,
+    VarTerminationBreach?:boolean,
+    VarTerminationStopping?:boolean,
+    fixedValue: string;
+    autoRnewal:string;
+    renewalNotice:string;
+    Perpetual:string
+    discretionary:string;
+    terminationBreach:string;
+    terminationStopping:string
+    status:string;
+    RequestID:string;
+    items?: IListItem[];  
+    Items?:IParentsItems[];
+    ChildItem?:IChildsItems[];
+    allContractItems:any[];
+    user:any;
+    Peopleuser:string;
+    SelectedPaymentType:string;
+    openEditDialog:boolean;
+    openInvoicePDF:boolean;
+    openMilestonePopup:boolean;
+    Period:any;
+    VariablePeriod:any;
+    IProcurementModel:any;
+    IPeriodicallyModel:any;
+    IVariablePeriodicallyModel:any;
+    IContractItems:any;
+    PopupType:string;
+    IObligation:any;
+    IInsurance:any;
+    formType:string;
+    openInsurancePopup:boolean;
+    FixedValue:string;
+    AutoRenewalValue:string;
+    RenewalByNoticeValue:string;
+    PerpetualValue:string;
+    DiscretionaryValue:string;
+    TerminationBreachValue:string;
+    TerminationStoppingValue:string;
+
+    AddProjectName:string;
+    AddContractingParty:string;
+    Bind_ContractType:string;
+    AddContractingPartyID:any;
+    AddProjectNameID:any;
+    AddContractType:any;
+    DescriptionOfProduct:string;
+    VendorPointOfContact:string;
+    TotalContractValue:string;
+    BudgetId:string;
+    VendorAddress:string;
+    Comments:string;
+    FixedDate:any;
+    TerminationPeriod:string;
+    DateToExtend:string;
+    DaysForNotice:string;
+    RecoveryPeriod:string;
+    NoOfDays:string;
+    AmountUSD:string;
+    VariableAmountUSD:string;
+    Amountusd:string;
+    firstDayOfWeek: any, 
+    value: any;
+    TerminationDate:Date;
+    ContractDate:any;
+    FirstPaymentDate:any;
+    FromDate:any;
+    ToDate:any;
+    PaymentDate:any;
+    DisabledValue:boolean;
+    selectedItemID:any;
+    Bind_BesaEntity:string;
+    Bind_ContractingParty:string;
+    Bind_ProjectName:string;
+    Bind_PaymentType:string;
+    Bind_Period:string,
+    BindRiskFactor:string,
+    selectedContractSubmission:any;
+    Milestoneitems: any[];
+    selectedItem:any;
+    file:any;
+    fileInfos:any;
+    FilesToDelete:any;
+    arrayData:any;
+    IsBtnClicked:boolean;
+    HideMore:boolean;
+    Documents:any;
+    ClickDraft:string;
+    ContractPartyArr:any;
+    ProjectNameArr:any;
+    ExportItemArr:any;
+    DocumentArr:any;
+    isDocAttached:boolean;
+    DocAttachedErrMsg:string;
+    SubmissionType:string;
+    BesaOfficerText:string;
+    BindBesaOfficerText:string;
+    TransactionType:any;
+    BindTransactionType:string;
+    openObligationPopup:boolean;
+    RadioOption:string;
+    MenuTab:string;
+    ReminderDate:any;
+    BindReminderComment:string;
+    VarDisabledBtnOnCreate:boolean;
+    SelectedContractType:string;
+    SelectedContractingParty:string;
+    SelectedCompanyProject:string;
+    VarDropdownHide:boolean
+   }

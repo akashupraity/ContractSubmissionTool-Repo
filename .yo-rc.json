@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.13.0",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.9.1"
+    },
+    "version": "1.17.1",
+    "libraryName": "contract-form-pn-p",
+    "libraryId": "015710ae-f4fc-4cf5-8c58-6a5026b50e73",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "ContractFormPnP",
+    "solutionShortDescription": "ContractFormPnP description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

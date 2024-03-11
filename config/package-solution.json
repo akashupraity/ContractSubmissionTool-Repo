@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "contract-form-pn-p-client-side-solution",
+    "id": "015710ae-f4fc-4cf5-8c58-6a5026b50e73",
+    "version": "1.0.0.63",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.17.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "ContractFormPnP description"
+      },
+      "longDescription": {
+        "default": "ContractFormPnP description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "contract-form-pn-p Feature",
+        "description": "The feature that activates elements of the contract-form-pn-p solution.",
+        "id": "21e41cbc-77c4-4d76-90d8-e123ea1fc207",
+        "version": "1.0.0.0"
+      } 
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/contract-form-pn-p.sppkg"
+  }
+}
