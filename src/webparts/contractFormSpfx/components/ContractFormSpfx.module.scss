@@ -444,6 +444,14 @@ h4{
     width: 9%;
     height: 26px;
     }
+    .Reportbtn{
+    background-color: #126358;
+    color: #fff;
+    text-align: center;
+    width: 9%;
+    height: 26px;
+    margin-left: 42px;
+    }
 
     .CloseMilestone{
       margin-left: 10%;
@@ -506,4 +514,8 @@ h4{
   .Fields{
     background-color: white;
     color: #000;
+  }
+  .ExpiredCheckBox{
+    padding-top: 6px;
+    padding-left: 15px;
   }
