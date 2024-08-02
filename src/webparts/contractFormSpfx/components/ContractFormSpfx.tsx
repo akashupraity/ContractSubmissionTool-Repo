@@ -14,9 +14,7 @@ import * as XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/js/src/collapse.js";
-//import '../node_modules/font-awesome/css/font-awesome.min.css'; 
-//import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-//import { Image } from 'office-ui-fabric-react';
+
 import 'font-awesome/css/font-awesome.min.css';
 import {jsPDF} from 'jspdf';
 //import html2canvas from 'html2canvas';
