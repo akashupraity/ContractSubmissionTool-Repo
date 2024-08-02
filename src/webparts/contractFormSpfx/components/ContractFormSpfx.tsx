@@ -4,7 +4,6 @@ import { IContractFormSpfxProps } from './IContractFormSpfxProps';
 import { SPOperation } from './Services/SPServices';
 import { Checkbox, ChoiceGroup, DatePicker, DayOfWeek, DefaultButton, Dropdown, FontIcon, FontWeights, IButtonStyles, IChoiceGroupOption, IChoiceGroupStyles, IDropdownOption, IIconProps, Icon, IconButton, Modal, Pivot, PivotItem, SelectionMode, TextField, getTheme, mergeStyleSets } from 'office-ui-fabric-react';
 import { IContractFormSpfxState } from './IContractFormSpfxState';
-//import { PeoplePicker } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { ListView, IViewField, IGrouping, GroupOrder } from '@pnp/spfx-controls-react';
 import { IListItem } from './models/IListItem';
 import { trimStart } from '@microsoft/sp-lodash-subset';
@@ -14,11 +13,9 @@ import * as XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/js/src/collapse.js";
-
 import 'font-awesome/css/font-awesome.min.css';
 import {jsPDF} from 'jspdf';
-//import html2canvas from 'html2canvas';
-//import { useRef } from "react";
+
 
 const cancelIcon: IIconProps = { iconName: 'Cancel' };
 
@@ -132,6 +129,7 @@ export default class ContractFormSpfx extends React.Component<IContractFormSpfxP
     this._SPOps = new SPOperation(this.props.siteURL);
     this.state = {
       fixedValue: '',
+      ExpiredValue:'',
       selectedItemID:null,
       Bind_ContractType: '',
       autoRnewal: '',
@@ -156,6 +154,7 @@ export default class ContractFormSpfx extends React.Component<IContractFormSpfxP
       PaymentType: [],
       AddMore: false,
       VarFixedValue: false,
+      VarExpiredValue:false,
       VarAutoRnewal: false,
       VarRenewalNotice: false,
       VarPerpetual:false,
@@ -251,11 +250,14 @@ export default class ContractFormSpfx extends React.Component<IContractFormSpfxP
       SelectedContractType:'',
       SelectedContractingParty:'',
       SelectedCompanyProject:'',
-      VarDropdownHide:false
+      VarDropdownHide:false,
+      RenewalNoticeDate:undefined,
+      BindStatus:''
     };
     this.AttachmentErr=this.AttachmentErr.bind(this);
     this.AddMoreInfo = this.AddMoreInfo.bind(this);
     this._getFixedValue = this._getFixedValue.bind(this);
+    this._getExpiredValue = this._getExpiredValue.bind(this);
     this._getAutoRenewal = this._getAutoRenewal.bind(this);
     this._getRenewalNotice = this._getRenewalNotice.bind(this);
     this._getPerpetual=this._getPerpetual.bind(this);
@@ -399,6 +401,14 @@ export default class ContractFormSpfx extends React.Component<IContractFormSpfxP
     }
     
   }
+  private _getExpiredValue(ExpiredEv?: React.FormEvent<HTMLElement | HTMLInputElement>, VarExpiredValue?: boolean) {
+    if (VarExpiredValue==false) {
+      this.setState({ VarExpiredValue, ExpiredValue: null });
+    }else{
+      this.setState({ VarExpiredValue, ExpiredValue: ExpiredEv.currentTarget.title });
+    }
+    
+  }
   private _getAutoRenewal(AutoRenewalEv?: React.FormEvent<HTMLElement | HTMLInputElement>, VarAutoRnewal?: boolean) {
     if (VarAutoRnewal==false) {
       this.setState({ VarAutoRnewal, AutoRenewalValue: null });
@@ -538,40 +548,40 @@ export default class ContractFormSpfx extends React.Component<IContractFormSpfxP
 
 
   public handleKeyDown=(e:any)=> {
-   const forbiddenChars = /[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/;
+   const forbiddenChars = /[~`!@#$%^*_+={}\[\]:;.<>/?]/;
     if (forbiddenChars.test(e.key)) {
       e.preventDefault();
     }
   }
 
   public getAddProjectName = (event: any, data: any) => {
-    const forbiddenChars = /[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/;
+    const forbiddenChars = /[~`!@#$%^*_+={}\[\]:;.<>/?]/;
     if (forbiddenChars.test(data)) {
       alert("Data contains invalid character")
       event.preventDefault();
       
     }else
-    this.setState({SelectedCompanyProject : data.replaceAll(/[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/g,'')}) 
+    this.setState({SelectedCompanyProject : data.replaceAll(/[~`!@#$%^*_+={}\[\]:;.<>/?]/g,'')}) 
   }
 
   public getAddContractType = (event: any, data: any) => {
-    const forbiddenChars = /[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/;
+    const forbiddenChars = /[~`!@#$%^*_+={}\[\]:;.<>/?]/;
     if (forbiddenChars.test(data)) {
       alert("Data contains invalid character")
       event.preventDefault();
       
     }else
-    this.setState({SelectedContractType : data.replaceAll(/[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/g,'')}) 
+    this.setState({SelectedContractType : data.replaceAll(/[~`!@#$%^*_+={}\[\]:;.<>/?]/g,'')}) 
   }
 
   public getAddContractingParty = (event: any, data: any) => {
-    const forbiddenChars = /[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/;
+    const forbiddenChars = /[~`!@#$%^*_+={}\[\]:;.<>/?]/;
     if (forbiddenChars.test(data)) {
       alert("Data contains invalid character")
       event.preventDefault();
       
     }else
-    this.setState({SelectedContractingParty : data.replaceAll(/[~`!@#$%^&*()_+={}\[\]:;,.<>/?-]/g,'')}) 
+    this.setState({SelectedContractingParty : data.replaceAll(/[~`!@#$%^*_+={}\[\]:;.<>/?]/g,'')}) 
   }
 
   // --------------getComment --------------
@@ -594,6 +604,11 @@ export default class ContractFormSpfx extends React.Component<IContractFormSpfxP
  */
   public TerminationDateChange = (Terminationdate: Date | null | undefined): void => {
     this.setState({ TerminationDate: Terminationdate });
+  };
+  
+  // Renewal By Notice Date
+  public RenewalNoticeDateChange = (RenewalNoticeDate: Date | null | undefined): void => {
+    this.setState({ RenewalNoticeDate: RenewalNoticeDate });
   };
 
   /**
@@ -823,7 +838,6 @@ public _getUniqueRequestorID = (ContractItemId:any) => {
    /**
    * Create object for pass bulk data at one time
    */
-
   public createItem = (SubmissionType: any) => {
    
     this.setState({ SubmissionType: SubmissionType})
@@ -852,6 +866,7 @@ public _getUniqueRequestorID = (ContractItemId:any) => {
           TerminationType: this.state.FixedValue + "" + this.state.AutoRenewalValue + "" + this.state.RenewalByNoticeValue+ "" +this.state.PerpetualValue,
           NoticeOfTermination: this.state.DiscretionaryValue + "" + this.state.TerminationBreachValue + "" + this.state.TerminationStoppingValue,
           FixedDate: this.state.TerminationDate == undefined ? null : this.state.TerminationDate,
+          RenewalDate:this.state.RenewalNoticeDate == undefined ? null : this.state.RenewalNoticeDate,
           TerminationPeriod: this.SelectedRenewalPeriod == undefined ? "" : this.SelectedRenewalPeriod,
           DateToExtend: this.SelectedDaysBeforeRenewalDate == undefined ? null : this.SelectedDaysBeforeRenewalDate,
           ConvinienceDate: this.SelectedgetDaysForNotice == undefined ? "" : this.SelectedgetDaysForNotice,
@@ -990,7 +1005,6 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         Title: this.state.Bind_ContractingParty == null ? null : this.state.Bind_ContractingParty,
         ProjectName: this.state.Bind_ProjectName == null ? null : this.state.Bind_ProjectName,
         DescriptionOfProduct: this.state.DescriptionOfProduct == null ? "" : this.state.DescriptionOfProduct,
-        //BesaOfficersId: this.state.user,
         VndorDetails:this.state.BindBesaOfficerText,
         VendorName: this.state.VendorPointOfContact == null ? "" : this.state.VendorPointOfContact,
         TotalContractPayment: this.state.TotalContractValue == null ? " " : this.state.TotalContractValue,
@@ -1000,6 +1014,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         TerminationType: this.state.FixedValue + " " + this.state.AutoRenewalValue + " " + this.state.RenewalByNoticeValue+ "" +this.state.PerpetualValue,
         NoticeOfTermination: this.state.DiscretionaryValue + " " + this.state.TerminationBreachValue + " " + this.state.TerminationStoppingValue,
         FixedDate: this.state.TerminationDate == null ? null : this.state.TerminationDate,
+        RenewalDate:this.state.RenewalNoticeDate == undefined ? null : this.state.RenewalNoticeDate,
         TerminationPeriod: this.state.TerminationPeriod == null ? "" : this.state.TerminationPeriod,
         DateToExtend: this.state.DateToExtend == null ? null : this.state.DateToExtend,
         ConvinienceDate: this.state.DaysForNotice == null ? "" : this.state.DaysForNotice,
@@ -1135,6 +1150,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
           TerminationType: this.state.FixedValue + "" + this.state.AutoRenewalValue + "" + this.state.RenewalByNoticeValue+ "" +this.state.PerpetualValue,
           NoticeOfTermination: this.state.DiscretionaryValue + "" + this.state.TerminationBreachValue + "" + this.state.TerminationStoppingValue,
           FixedDate: this.state.TerminationDate == undefined ? null : this.state.TerminationDate,
+          RenewalDate:this.state.RenewalNoticeDate == undefined ? null : this.state.RenewalNoticeDate,
           TerminationPeriod: this.SelectedRenewalPeriod == undefined ? "" : this.SelectedRenewalPeriod,
           DateToExtend: this.SelectedDaysBeforeRenewalDate == undefined ? null : this.SelectedDaysBeforeRenewalDate,
           ConvinienceDate: this.SelectedgetDaysForNotice == undefined ? "" : this.SelectedgetDaysForNotice,
@@ -1177,7 +1193,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
             .CreatePeriodically(this.state.IPeriodicallyModel, this.state.status);
 
             this._SPOps
-            .CreateVariablePeriodically(this.state.IPeriodicallyModel, this.state.status);
+            .CreateVariablePeriodically(this.state.IVariablePeriodicallyModel, this.state.status);
 
 
           if (this.state.AddProjectName == "Other") {
@@ -1271,6 +1287,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         TerminationType: this.state.FixedValue + " " + this.state.AutoRenewalValue + " " + this.state.RenewalByNoticeValue+ " " +this.state.PerpetualValue,
         NoticeOfTermination: this.state.DiscretionaryValue + " " + this.state.TerminationBreachValue + " " + this.state.TerminationStoppingValue,
         FixedDate: this.state.TerminationDate == null ? null : this.state.TerminationDate,
+        RenewalDate:this.state.RenewalNoticeDate == undefined ? null : this.state.RenewalNoticeDate,
         TerminationPeriod: this.state.TerminationPeriod == null ? "" : this.state.TerminationPeriod,
         DateToExtend: this.state.DateToExtend == null ? null : this.state.DateToExtend,
         ConvinienceDate: this.state.DaysForNotice == null ? "" : this.state.DaysForNotice,
@@ -1287,7 +1304,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         RiskFactor:this.state.BindRiskFactor,
         ReminderComment:this.state.BindReminderComment,
         ReminderDate:this.state.ReminderDate,
-        Status: "Submitted"
+        Status:this.state.ExpiredValue === "" && this.state.BindStatus === "Submitted" ? "Submitted" :"Expired"
       }
 
       this._SPOps
@@ -1617,6 +1634,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         TerminationType: this.state.FixedValue + " " + this.state.AutoRenewalValue + " " + this.state.RenewalByNoticeValue+ " " +this.state.PerpetualValue,
         NoticeOfTermination: this.state.DiscretionaryValue + " " + this.state.TerminationBreachValue + " " + this.state.TerminationStoppingValue,
         FixedDate: this.state.TerminationDate == null ? null : this.state.TerminationDate,
+        RenewalDate:this.state.RenewalNoticeDate == undefined ? null : this.state.RenewalNoticeDate,
         TerminationPeriod: this.state.TerminationPeriod == null ? "" : this.state.TerminationPeriod,
         DateToExtend: this.state.DateToExtend == null ? null : this.state.DateToExtend,
         ConvinienceDate: this.state.DaysForNotice == null ? "" : this.state.DaysForNotice,
@@ -1633,7 +1651,7 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         RiskFactor:this.state.BindRiskFactor,
         ReminderComment:this.state.BindReminderComment,
         ReminderDate:this.state.ReminderDate,
-        Status: "Submitted"
+        Status: this.state.ExpiredValue == "Expired" ? "Expired" : "Submitted"
       }
 
       this._SPOps
@@ -2066,7 +2084,6 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         Bind_BesaEntity: result.BesaEntity,
         Bind_ProjectName: trimStart(result.ProjectName),
         DescriptionOfProduct: result.DescriptionOfProduct,
-        //user: result.BesaOfficers.EMail,
         BindBesaOfficerText:result.VndorDetails,
         VendorPointOfContact: result.VendorName,
         TotalContractValue: result.TotalContractPayment,
@@ -2088,7 +2105,8 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         TerminationBreachValue:result.NoticeOfTermination != null && result.NoticeOfTermination.indexOf("Termination by breach") > -1 ==true?"Termination by breach":null, 
         VarTerminationStopping:result.NoticeOfTermination,
         TerminationStoppingValue:result.NoticeOfTermination && result.NoticeOfTermination.indexOf("Termination by non-renewal") > -1 ==true?"Termination by non-renewal":null,
-        TerminationDate: result.FixedDate !=null?new Date(result.FixedDate):null, 
+        TerminationDate: result.FixedDate !=null?new Date(result.FixedDate):null,
+        RenewalNoticeDate:result.RenewalDate !=null?new Date(result.RenewalDate):null, 
         TerminationPeriod: result.TerminationPeriod,  
         DateToExtend: result.DateToExtend,
         DaysForNotice: result.ConvinienceDate,
@@ -2103,7 +2121,8 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
         ContractDate: result.ContractDate !=null?new Date(result.ContractDate):null,
         AddContractingPartyID: result.CompanyID,
         AddProjectNameID: result.ProjectID,  
-        BindTransactionType:result.TransactionType
+        BindTransactionType:result.TransactionType,
+        BindStatus:result.Status
       })
       
       setTimeout(
@@ -2204,14 +2223,24 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
       minWidth: 0,
       maxWidth: 180
     },
-    {
-      name: "TransactionType",
-      displayName: "Transaction Type",
-      isResizable: false,
-      sorting: true,
-      minWidth: 0,
-      maxWidth: 180
-    }
+    // {
+    //   name: "TransactionType",
+    //   displayName: "Transaction Type",
+    //   isResizable: false,
+    //   sorting: true,
+    //   minWidth: 0,
+    //   maxWidth: 180
+    // }
+    // ,
+        {
+            name: "AuthorTitle",
+            displayName: "Submitted By",
+            isResizable: false,
+            sorting: true,
+            minWidth: 0,
+            maxWidth: 180,
+            //render: (item: any) => item.Author ? item.Author.Title : ""
+        }
     ];
     return viewFields;
   };
@@ -2268,7 +2297,6 @@ public _getChildUniqueRequestorID = (ContractItemId:any,ParentItemID:any) => {
       minWidth: 0,
       maxWidth: 100
     },
-
     {
       name: "",
       displayName: "",
@@ -2526,7 +2554,10 @@ public printDocument=() => {
       console.error(error);
     }
   };
-
+  
+  private openNewTab(url: string): void {
+    window.open(url, '_blank');
+  }
 
   public ExportExcelFormat(items: any) {
     try {
@@ -2946,6 +2977,15 @@ public printDocument=() => {
         <div className={styles.renderPeriodicallyTbl}>
           <div className="form-group col-md-5">
             {idx == 0 && <span>  <label className={styles.lblCtrl}>First Payment Date</label></span>}
+                         {/* <DatePicker
+                           placeholder='Select First Payment Date..'
+                           className='form-control '
+                           disabled={this.state.DisabledValue}
+                           id={this.state.IPeriodicallyModel[idx].id}
+                           value={this.state.IPeriodicallyModel[idx].FirstPaymentDate}
+                           onSelectDate={() =>this._handleChangePeriodically(idx)}
+                           onKeyDown={(e) => e.preventDefault()}
+                        /> */}
             <input
               placeholder='Select First Payment Date..'
               className='form-control '
@@ -3090,6 +3130,17 @@ renderPeriodicallyTableData() {
       <div className={styles.renderPeriodicallyTbl}>
         <div className="form-group col-md-5">
           {idx == 0 && <span>  <label className={styles.lblCtrl}>First Payment Date</label></span>}
+
+                         {/* <DatePicker
+                           placeholder='Select First Payment Date..'
+                           className='form-control '
+                           disabled={this.state.DisabledValue}
+                           id={this.state.IPeriodicallyModel[idx].id}
+                          //  Name="FirstPaymentDate"
+                           //value={this.state.IPeriodicallyModel[idx].Date}
+                           onSelectDate={()=>this._handleChangePeriodically(idx)}
+                           onKeyDown={(e) => e.preventDefault()}
+                        /> */}
           <input
             placeholder='Select First Payment Date..'
             className='form-control '
@@ -4117,10 +4168,20 @@ InsurancerenderTableDataInvoice() {
             </div>
             
             <div className='styles.col-md-7'>
-
+            <div className={styles.rowTable}>
+                    {/* BesaEntity Dropdown */}
+                    <div className={styles.colmd3}>
               <div className={styles.printIcon}>
                 <DefaultButton className={styles.Exportbtn} onClick={this.exportToExcel}>Export</DefaultButton>
 
+              </div>
+              </div>
+              <div className={styles.colmd3}>
+              <div className={styles.printIcon}>
+                <DefaultButton className={styles.Reportbtn} onClick={() => this.openNewTab('https://app.powerbi.com/reportEmbed?reportId=d0461672-031f-489d-9377-7b6a86c45d0f&autoAuth=true&ctid=8d7a8614-7904-447a-9147-6b74a48adbea')}>Report</DefaultButton>
+
+              </div>
+              </div>
               </div>
 
               {/* </div> */}
@@ -4193,19 +4254,7 @@ InsurancerenderTableDataInvoice() {
       
                       </div>
                   </div>
-                //   <div className={styles.contractFormSpfx}>
-                //   <ListView
-                //   listClassName={styles.listViewStyle}
-                //   items={this.state.IContractItems}
-                //   viewFields={this.ViewChildFields()}
-                //   groupByFields={this.groupByChildFields()}
-                //   compact={true}
-                //   selectionMode={SelectionMode.none}
-                //   showFilter={true}
-                //   filterPlaceHolder="Search..."
-                //   /> 
-                // </div> 
-                //} */}
+                
   }
   
               {
@@ -4291,20 +4340,11 @@ InsurancerenderTableDataInvoice() {
                     <div className={styles.colmd3}>
                       <label className={styles.labelstyle}>Besa Officer</label>
                       <br></br>
-                     {/* <div className={styles.myDropDown}> */}
-                        {/* <PeoplePicker
-                          context={this.props.Context}
-                          onChange={this.getPeoplePicker}
-                          placeholder="Enter your Name"
-                          personSelectionLimit={1}
-                          ensureUser={true} /> */}
                           <TextField className={styles.myDropDown}
                           type="textarea"
                           onChange={this.getbesaOfficer}
                           placeholder="Name of the Besa Officer.."
                       />
-
-                      {/* </div> */}
                     </div>
 
                     {/* Contracting Party Dropdown */}
@@ -4403,8 +4443,8 @@ InsurancerenderTableDataInvoice() {
                         placeholder="Type Comment.." />
                     </div>
 
- {/* Contract Description TextField */}
- <div className={styles.colmd3}>
+                      {/* Contract Description TextField */}
+                      <div className={styles.colmd3}>
                       <label className={styles.labelstyle}>Contract Description</label>
 
                       <TextField className={styles.myDropDown}
@@ -4574,6 +4614,21 @@ InsurancerenderTableDataInvoice() {
                             onChange={this.getDaysBeforeRenewalDate}
                             placeholder="Type Days before Renewal Date.."
                           />
+                        </div>
+                      }
+                      {this.state.VarRenewalNotice &&
+                        <div className={styles.colmd3}>
+                          <label className={styles.labelstyle}>Renewal Date</label>
+                          <br></br>
+                          <div className={styles.myDropDown}>
+                            <DatePicker
+                              placeholder="Select Renewal Date..."
+                              ariaLabel="Select a date"
+                              value={this.state.RenewalNoticeDate}
+                              onSelectDate={this.RenewalNoticeDateChange}
+                             
+                            />
+                          </div>
                         </div>
                       }
                     </div>
@@ -4857,6 +4912,9 @@ InsurancerenderTableDataInvoice() {
                       <DefaultButton className={styles.ObligationBtn} onClick={this.ObligationOpenPopup} >Obligation</DefaultButton>
 
                       <DefaultButton className={styles.ObligationBtn} onClick={this.InsuranceOpenPopup} >Insurance</DefaultButton>
+
+
+                      
                     </div>
                      {/* Submitted Button */}
                     <div className={styles.colmd3}>
@@ -5032,7 +5090,6 @@ InsurancerenderTableDataInvoice() {
                           disabled={this.state.DisabledValue}
                           onSelectDate={this.ContractDateChange}
                           value={this.state.ContractDate}
-                          
                         />
                         </p>
                 </td>
@@ -5241,6 +5298,16 @@ InsurancerenderTableDataInvoice() {
                    {
                     this.state.DisabledValue != true &&
                        <span id={"Popup"}>Edit Submission</span>
+                    }
+                    {
+                    this.state.DisabledValue != true &&
+                          <div className={styles.ExpiredCheckBox}>
+                          <Checkbox label="Expired"
+                          title="Expired"
+                          onChange={this._getExpiredValue}
+                          defaultChecked={this.state.BindStatus == "Expired"? true : false}
+                          disabled={this.state.DisabledValue} />
+                          </div>
                     }
 
                     {
@@ -5566,7 +5633,7 @@ InsurancerenderTableDataInvoice() {
                       <div className={styles.colmd3}>
                         <label className={styles.labelstyle}>Attachment</label>
                         <input className='form-control'
-                          type="file" ref={(elm) => { this._input = elm; }}></input>
+                          type="file" ref={(elm) => { this._input = elm; }}onChange={this.AttachmentErr}></input>
                           {this.state.isDocAttached && <span className={styles.errorMSG}>
                           {this.state.DocAttachedErrMsg}
                         </span>}
@@ -5720,6 +5787,23 @@ InsurancerenderTableDataInvoice() {
                         />
                       </div>
                     }
+
+                       {this.state.RenewalByNoticeValue &&
+                        <div className={styles.colmd3}>
+                          <label className={styles.labelstyle}>Renewal Date</label>
+                          <br></br>
+                          <div className={styles.myDropDown}>
+                            <DatePicker
+                              placeholder="Select Renewal Date..."
+                              ariaLabel="Select a date"
+                              value={this.state.RenewalNoticeDate}
+                              onSelectDate={this.RenewalNoticeDateChange}
+                              disabled={this.state.DisabledValue}
+                            />
+                          </div>
+                        </div>
+                      }
+
                   </div>
 
                   <div className={styles.rowTable}>

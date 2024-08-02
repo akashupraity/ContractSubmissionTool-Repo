@@ -12,7 +12,6 @@ export class SPOperation{
     props: any;
     state: { file: any; };
     ServerUrl: any;
-
     public constructor(public siteURL:string){
         
         
@@ -164,28 +163,34 @@ export class SPOperation{
         let web=Web(this.siteURL)
         return new Promise<IListItem[]>(async (resolve, reject) => {  
             try {   
-                let listItems:IListItem[]=[];
-                web.lists.getByTitle(listName).items.select("*","BesaOfficers/ID","BesaOfficers/Title","BesaOfficers/EMail").expand("BesaOfficers").getAll().then((results:any) => {  
-                    results.map((item:any) => { +
-
-                        listItems.push({  
-                            Title: item.Title,  
-                            ProjectName: item.ProjectName,  
-                            BesaEntity: item.BesaEntity,  
-                            //BesaOfficers: item.BesaOfficersId ==null?"":item.BesaOfficers.Title,
-                            VndorDetails:item.VndorDetails,
-                            Status:item.Status,
-                            TransactionType:item.TransactionType,
-                            RequestID:item.RequestID,
-                            ID:item.ID
+                let listItems: IListItem[] = [];
+                web.lists.getByTitle(listName).items
+                    .select("*", "BesaOfficers/ID", "BesaOfficers/Title", "BesaOfficers/EMail","Author/Title")
+                    .expand("BesaOfficers", "Author")
+                    .getAll()
+                    .then((results: any) => {  
+                        results.map((item: any) => { 
+                            listItems.push({  
+                                Title: item.Title,  
+                                ProjectName: item.ProjectName,  
+                                BesaEntity: item.BesaEntity,  
+                                VndorDetails: item.VndorDetails,
+                                Status: item.Status,
+                                TransactionType: item.TransactionType,
+                                RequestID: item.RequestID,
+                                AuthorTitle: item.Author.Title,
+                                ID: item.ID
+                            });  
                         });  
-                        
-                    });  
-                       resolve(listItems);  
-                });  
-            }  
-            catch (error) {  
-                console.log(error);  
+                        resolve(listItems);  
+                    })
+                    .catch((error: any) => {
+                        console.error("Error fetching list items: ", error);
+                        reject(error);
+                    });
+            } catch (error) {  
+                console.error("Error in getAllItems: ", error);  
+                reject(error);
             }  
         });  
     }  
@@ -539,14 +544,14 @@ public async _addPeriodicallyDetails(IModel:any,RequestID:any,ListName:any){
       // */
 public async UpdatePeriodicallyDetails(IModel:any,RequestID:any,ListName:any){
     let web=Web(this.siteURL)
-    for (const Model of IModel){
-    await web.lists.getByTitle(ListName).items.getById(Model.id).update({     
-        ContractId:RequestID,
-        Title:Model.AmountUSD,
-        FirstPaymentDate:Model.FirstPaymentDate !=null?new Date(Model.FirstPaymentDate):null,
-        Period:Model.Period
-    });
-    }
+    await Promise.all(IModel.map((Model: any) => 
+        web.lists.getByTitle(ListName).items.getById(Model.id).update({     
+            ContractId: RequestID,
+            Title: Model.AmountUSD,
+            FirstPaymentDate: Model.FirstPaymentDate != null ? new Date(Model.FirstPaymentDate) : null,
+            Period: Model.Period
+        })
+    ));
     }
 
 

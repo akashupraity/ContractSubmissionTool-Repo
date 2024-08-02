@@ -11,6 +11,7 @@ export interface IContractFormSpfxState {
     CurrentDate:Date;
     SelectBeckDateerrMsg:string
     VarFixedValue?: boolean;
+    VarExpiredValue?:boolean;
     VarAutoRnewal?:boolean,
     VarRenewalNotice?:boolean,
     VarPerpetual?:boolean
@@ -18,6 +19,7 @@ export interface IContractFormSpfxState {
     VarTerminationBreach?:boolean,
     VarTerminationStopping?:boolean,
     fixedValue: string;
+    ExpiredValue:string,
     autoRnewal:string;
     renewalNotice:string;
     Perpetual:string
@@ -79,6 +81,7 @@ export interface IContractFormSpfxState {
     firstDayOfWeek: any, 
     value: any;
     TerminationDate:Date;
+    RenewalNoticeDate:Date;
     ContractDate:any;
     FirstPaymentDate:any;
     FromDate:any;
@@ -123,5 +126,6 @@ export interface IContractFormSpfxState {
     SelectedContractType:string;
     SelectedContractingParty:string;
     SelectedCompanyProject:string;
-    VarDropdownHide:boolean
+    VarDropdownHide:boolean;
+    BindStatus:string
    }
